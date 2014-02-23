@@ -1,6 +1,7 @@
 <html>
 <head>
     <title>Find my Flickr photos (visual)</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
     <script>
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
