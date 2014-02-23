@@ -19,6 +19,11 @@
             ga('send', 'event', 'form', 'submited');
         }
 
+        function click_like(value) {
+            ga('send', 'event', 'like', value);
+            alert('Muito obrigado pelo voto (seja lá qual foi)')
+        }
+
     </script>
 </head>
 <body>
