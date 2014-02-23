@@ -1,0 +1,30 @@
+{
+    "name": "shina/find-my-flickr-photos",
+    "description": "description_text",
+    "minimum-stability": "stable",
+    "authors": [
+        {
+            "name": "Leonardo Shinagawa",
+            "email": "leonardo@ebussola.com"
+        }
+    ],
+
+    "require": {
+        "slim/slim": "~2.4",
+        "ebussola/feedee": "1.0.0"
+    },
+
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "ebussola/feedee",
+                "version": "1.0.0",
+                "dist": {
+                    "url": "dist/feedee.zip",
+                    "type": "zip"
+                }
+            }
+        }
+    ]
+}
