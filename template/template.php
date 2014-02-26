@@ -20,13 +20,13 @@
             ga('send', 'event', 'photo', 'click');
         }
 
-        function submit_form(el) {
-            ga('send', 'event', 'form', 'submited');
+        function login_flickr(el) {
+            ga('send', 'event', 'login_flickr', 'clicked');
         }
 
         function click_like(value) {
             ga('send', 'event', 'like', value);
-            alert('Muito obrigado pelo voto (seja lá qual foi)');
+            alert('Muito obrigado pelo voto!');
         }
 
     </script>
@@ -39,7 +39,7 @@
 <hr />
 
 <p style="clear:left">
-    Clique no like caso tenha gostado da idéia ou dislike caso não faça o menor sentido hehehe<br />
+    Clique no like caso tenha gostado da idéia ou dislike caso não faça o menor sentido.<br />
     <a href="javascript:void(0);" onclick="click_like('like')"><img src="like.png" width="60" /></a>
     <a href="javascript:void(0);" onclick="click_like('dislike')"><img src="dislike.jpg" width="48" /></a>
 </p>
