@@ -4,4 +4,25 @@
  * User: Leonardo
  * Date: 23/02/14
  * Time: 20:56
- */ 
+ */
+
+ return array(
+     'debug' => true,
+
+     'opauth' => array(
+         'path' => '/auth/',
+
+         'flickr' => array(
+             'callback' => '{path}callback',
+             'salt' => '',
+             'key' => '',
+             'secret' => '',
+
+             //dynamic config
+             'access_token' => null,
+             'secret_access_token' => null
+         )
+     ),
+
+     'template_path' => __DIR__ . '/template'
+ );
