@@ -4,4 +4,4 @@
 </p>
 <p>Eu uso muito isto pois minhas fotos estão como Creative Commons e muitas pessoas usam para criar conteúdo em blogs ou sites de notícias.</p>
 
-<a href="/auth/flickr">Login on Flickr</a>
+<a href="/auth/flickr">Clique para entrar<br /><img src="flickr_logo.png" width="100" /></a>
