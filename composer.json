@@ -9,22 +9,24 @@
         }
     ],
 
+    "autoload": {
+        "psr-0": {
+            "ebussola\\ffphotos\\": "src/"
+        }
+    },
+
     "require": {
         "slim/slim": "~2.4",
-        "ebussola/feedee": "1.0.0"
+        "opauth/flickr": "*@dev",
+        "aura/view": "~1.2",
+        "rezzza/flickr": "~1.0",
+        "guzzle/guzzle": "~3.8"
     },
 
     "repositories": [
         {
-            "type": "package",
-            "package": {
-                "name": "ebussola/feedee",
-                "version": "1.0.0",
-                "dist": {
-                    "url": "dist/feedee.zip",
-                    "type": "zip"
-                }
-            }
+            "type": "vcs",
+            "url": "https://github.com/ebussola/flickr"
         }
     ]
 }

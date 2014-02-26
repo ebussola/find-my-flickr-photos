@@ -7,27 +7,99 @@
  */
 
 require __DIR__ . '/../vendor/autoload.php';
-require __DIR__ . '/../vendor/ebussola/feedee/Feedee.php';
+$config = include __DIR__ . '/../config.php';
 
 $app = new \Slim\Slim();
-
-$app->response->write(file_get_contents(__DIR__.'/../template/header.php'));
-
-$app->get('/', function() use ($app) {
-    $app->response->write('<p>
-    FFPhotos é uma ferramenta para facilitar a procura de suas fotos do flickr no Web. <br />
-    No fundo, nada mais é que a busca do google images, mas de uma maneira mais fácil.
-</p>
-<p>Eu uso muito isto pois minhas fotos estão como Creative Commons e muitas pessoas usam para criar conteúdo em blogs ou sites de notícias.</p>');
-
-    $app->response->write('<p><strong>Use <a target="_blank" href="http://idgettr.com/">esta ferramenta</a> para descobrir o seu user ID no Flickr</strong></p>');
-
-    $app->response->write('<fieldset><form method="post" onsubmit="submit_form(this)"><label for="user_id">User ID</label><input type="text" id="user_id" name="user_id" /><input type="submit" /></form></fieldset>');
+\ebussola\ffphotos\Bootstrap::init($app, $config);
 
 
-    $app->response->write(file_get_contents(__DIR__.'/../template/footer.php'));
+$app->get('/', function () use ($app) {
+    /** @var \Aura\View\Template $template */
+    $template = $app->container->get('template');
+
+    $template->content = $template->fetch('main.php');
+    $app->response->setBody($template->fetch('template.php'));
 });
-$app->post('/', function() use ($app) {
+
+
+$app->group($config['opauth']['path'], function () use ($app) {
+    $action = function () use ($app) {
+        /** @var Opauth $opauth_flickr */
+        $opauth_flickr = $app->container->get('opauth_flickr');
+        $opauth_flickr->run();
+    };
+
+    $app->get('flickr', $action);
+    $app->get('flickr/oauth_callback', $action);
+
+    $app->get('callback', function () use ($app) {
+        session_start();
+
+        if (!isset($_SESSION['opauth']) && !isset($_SESSION['opauth']['auth']) && !isset($_SESSION['opauth']['auth']['credentials'])) {
+            $app->halt(500, 'Auth Error');
+        }
+
+         $app->redirect('/my_photos');
+    });
+});
+
+$app->group('/my_photos', function() use ($app) {
+    $app->get('/', function() use ($app) {
+        session_start();
+        $config = $app->container->get('config');
+        $config['opauth']['flickr']['access_token'] = $_SESSION['opauth']['auth']['credentials']['token'];
+        $config['opauth']['flickr']['secret_access_token'] = $_SESSION['opauth']['auth']['credentials']['secret'];
+        $app->container->set('config', $config);
+
+        /** @var \Rezzza\Flickr\ApiFactory $flickr */
+        $flickr = $app->container->get('flickr');
+        /** @var \Aura\View\Template $template */
+        $template = $app->container->get('template');
+
+        $photos_xml = $flickr->call('flickr.photos.search', array(
+            'user_id' => $_SESSION['opauth']['auth']['uid'],
+            'per_page ' => 500
+        ));
+
+        $calls = array();
+        foreach ($photos_xml->photos->photo as $photo_xml) {
+            /** @var SimpleXMLElement $photo_xml */
+            $photo_id = (string)$photo_xml['id'];
+            $calls[] = array('service' => 'flickr.photos.getSizes', 'parameters' => array('photo_id' => $photo_id), 'endpoint' => null);
+        }
+        $sizes_xml = $flickr->multiCall($calls);
+
+        $photos = array();
+        foreach ($sizes_xml as $i => $size_xml) {
+            $photo = new stdClass();
+            $photo->title = (string) $photos_xml->photos->photo[$i]['title'];
+
+            $highest_source = null;
+            $smalll_source = null;
+            foreach ($size_xml->sizes->size as $size) {
+                $source = (string) $size['source'];
+                if ($source != null) {
+                    $highest_source = $source;
+                }
+
+                $label = (string) $size['label'];
+                if ($label == 'Small') {
+                    $smalll_source = $source;
+                }
+            }
+
+            $photo->big = $highest_source;
+            $photo->small = $smalll_source;
+            $photos[] = $photo;
+        }
+
+        $template->photos = $photos;
+        $template->content = $template->fetch('my_photos.php');
+        $app->response->setBody($template->fetch('template.php'));
+    });
+});
+
+$app->post('/', function () use ($app) {
     $data = $app->request->post();
 
     $feedee = new Feedee('flickr');
@@ -36,10 +108,10 @@ $app->post('/', function() use ($app) {
     $app->response->write('<p>Por enquanto só as 20 últimas fotos são exibidas =(</p>');
 
     foreach ($feedee as $photo) {
-        $app->response->write('<div style="float:left; width:240px; margin: 3px">' . $photo->title . '<br /><a target="_blank" onclick="click_photo(this)" href="https://www.google.com/searchbyimage?&image_url='.$photo->big.'"><img src="'.$photo->medium.'" /></a></div>');
+        $app->response->write('');
     }
 
-    $app->response->write(file_get_contents(__DIR__.'/../template/footer.php'));
+    $app->response->write(file_get_contents(__DIR__ . '/../template/footer.php'));
 });
 
 $app->run();
