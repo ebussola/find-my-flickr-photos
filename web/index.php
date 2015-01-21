@@ -35,7 +35,7 @@ $app->group($config['opauth']['path'], function () use ($app) {
     $app->get('callback', function () use ($app) {
         session_start();
 
-        if (!isset($_SESSION['opauth']) && !isset($_SESSION['opauth']['auth']) && !isset($_SESSION['opauth']['auth']['credentials'])) {
+        if (!isset($_SESSION['opauth']) || !isset($_SESSION['opauth']['auth']) || !isset($_SESSION['opauth']['auth']['credentials'])) {
             $app->halt(500, 'Auth Error');
         }
 
